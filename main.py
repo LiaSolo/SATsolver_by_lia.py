@@ -17,12 +17,12 @@ class SATSolver:
     def del_uno(self, cnf):
         for c in cnf:
             if len(c) == 1:
-                for l in c:
-                    if l > 0:
-                        self.result[l] = True
+                for l_ in c:
+                    if l_ > 0:
+                        self.result[l_] = True
                     else:
-                        self.result[-l] = False
-                    cnf = [i.difference({-l}) for i in cnf]
+                        self.result[-l_] = False
+                    cnf = [i.difference({-l_}) for i in cnf]
 
                     if c in cnf:
                         cnf.remove(c)
@@ -31,20 +31,20 @@ class SATSolver:
 
     def del_pure(self, cnf):
         # print('del pure 1', cnf)
-        for l in range(1, self.num_vars + 1):
+        for l_ in range(1, self.num_vars + 1):
             flag = None
             for c in cnf:
-                if l in c and flag is None:
+                if l_ in c and flag is None:
                     flag = True
-                elif -l in c and flag is None:
+                elif -l_ in c and flag is None:
                     flag = False
-                elif (l in c and not flag) or (-l in c and flag):
+                elif (l_ in c and not flag) or (-l_ in c and flag):
                     flag = None
                     break
             if type(flag) == bool:
-                self.result[abs(l)] = flag
+                self.result[abs(l_)] = flag
                 for c in cnf:
-                    if l in c or -l in c:
+                    if l_ in c or -l_ in c:
                         cnf.remove(c)
 
         return cnf
@@ -59,8 +59,8 @@ class SATSolver:
         if any([len(c) == 0 for c in cnf]):
             return False
 
-        for l in cnf[0]:
-            literal = l
+        for l_ in cnf[0]:
+            literal = l_
             break
         if literal > 0:
             flag = True
@@ -91,11 +91,11 @@ class SATSolver:
         ans = True
         for c in self.clauses:
             temp = False
-            for l in c:
-                if l > 0:
-                    temp = temp or self.result[l]
+            for l_ in c:
+                if l_ > 0:
+                    temp = temp or self.result[l_]
                 else:
-                    temp = temp or (not self.result[-l])
+                    temp = temp or (not self.result[-l_])
             ans = ans and temp
 
         return ans
