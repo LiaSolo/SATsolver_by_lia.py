@@ -12,11 +12,9 @@ class SATSolver:
 
                 elif line[0] != 'c':
                     temp = set(map(int, line[:-2].split()))
-                    # print(temp)
                     self.clauses.append(temp)
 
     def del_uno(self, cnf):
-        # print('del uno 1', cnf)
         for c in cnf:
             if len(c) == 1:
                 for l in c:
@@ -27,13 +25,8 @@ class SATSolver:
                     cnf = [i.difference({-l}) for i in cnf]
 
                     if c in cnf:
-                        # print(c)
-                        # print('del uno 1', cnf)
                         cnf.remove(c)
 
-                    # print(cnf)
-        # print('del uno', cnf)
-        # print('del uno', self.result)
         return cnf
 
     def del_pure(self, cnf):
@@ -54,14 +47,9 @@ class SATSolver:
                     if l in c or -l in c:
                         cnf.remove(c)
 
-        # print('del pure', cnf)
-        # print('del pure', self.result)
-
         return cnf
 
     def dpll(self, cnf):
-        # print(cnf)
-        # print(self.result)
         cnf = self.del_uno(cnf)
         cnf = self.del_pure(cnf)
 
@@ -79,8 +67,9 @@ class SATSolver:
         else:
             flag = False
 
-        # выкинули истинные клозы и из клоз еще ложную литеру
+        # remove true clauses
         new_cnf = [c for c in cnf if literal not in c]
+        # remove false literal
         new_cnf = [c.difference({-literal}) for c in new_cnf]
 
         sat = self.dpll(new_cnf)
@@ -108,6 +97,5 @@ class SATSolver:
                 else:
                     temp = temp or (not self.result[-l])
             ans = ans and temp
+
         return ans
-
-
