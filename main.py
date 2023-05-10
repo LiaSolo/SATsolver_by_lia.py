@@ -7,21 +7,21 @@ class SATSolver:
             for line in lines:
                 if line[:5] == 'p cnf':
                     self.num_vars, self.num_clauses = map(int, line[6:].split())
-                    self.result = {i: True for i in range(1, self.num_vars + 1)}
-                    self.clauses = list()
+                    self.__result = {i: True for i in range(1, self.num_vars + 1)}
+                    self.__clauses = list()
 
                 elif line[0] != 'c':
                     temp = set(map(int, line[:-2].split()))
-                    self.clauses.append(temp)
+                    self.__clauses.append(temp)
 
-    def del_uno(self, cnf):
+    def __del_uno(self, cnf):
         for c in cnf:
             if len(c) == 1:
                 for l_ in c:
                     if l_ > 0:
-                        self.result[l_] = True
+                        self.__result[l_] = True
                     else:
-                        self.result[-l_] = False
+                        self.__result[-l_] = False
                     cnf = [i.difference({-l_}) for i in cnf]
 
                     if c in cnf:
@@ -29,7 +29,7 @@ class SATSolver:
 
         return cnf
 
-    def del_pure(self, cnf):
+    def __del_pure(self, cnf):
         # print('del pure 1', cnf)
         for l_ in range(1, self.num_vars + 1):
             flag = None
@@ -42,16 +42,23 @@ class SATSolver:
                     flag = None
                     break
             if type(flag) == bool:
-                self.result[abs(l_)] = flag
+                self.__result[abs(l_)] = flag
                 for c in cnf:
                     if l_ in c or -l_ in c:
                         cnf.remove(c)
 
         return cnf
 
-    def dpll(self, cnf):
-        cnf = self.del_uno(cnf)
-        cnf = self.del_pure(cnf)
+    def DPLL(self):
+        is_sat = SATSolver.__dpll(self, self.__clauses)
+        if is_sat:
+            return is_sat, self.__result
+        else:
+            return is_sat, None
+
+    def __dpll(self, cnf):
+        cnf = self.__del_uno(cnf)
+        cnf = self.__del_pure(cnf)
 
         if len(cnf) == 0:
             return True
@@ -72,30 +79,30 @@ class SATSolver:
         # remove false literal
         new_cnf = [c.difference({-literal}) for c in new_cnf]
 
-        sat = self.dpll(new_cnf)
+        sat = self.__dpll(new_cnf)
         if sat:
-            self.result[abs(literal)] = flag
+            self.__result[abs(literal)] = flag
             return sat
 
         new_cnf = [c for c in cnf if -literal not in c]
         new_cnf = [c.difference({literal}) for c in new_cnf]
 
-        sat = self.dpll(new_cnf)
+        sat = self.__dpll(new_cnf)
         if sat:
-            self.result[abs(literal)] = not flag
+            self.__result[abs(literal)] = not flag
             return sat
 
         return False
 
     def check_model(self):
         ans = True
-        for c in self.clauses:
+        for c in self.__clauses:
             temp = False
             for l_ in c:
                 if l_ > 0:
-                    temp = temp or self.result[l_]
+                    temp = temp or self.__result[l_]
                 else:
-                    temp = temp or (not self.result[-l_])
+                    temp = temp or (not self.__result[-l_])
             ans = ans and temp
 
         return ans
