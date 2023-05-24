@@ -10,5 +10,3 @@ for _ in range(40):
 
     end = time.time()
     time0.append('%s' % float('%.3g' % (end - start)))
-
-
